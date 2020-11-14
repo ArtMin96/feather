@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateUserPasswordRequest;
 use App\Http\Requests\UpdateUserProfile;
 use App\Models\Profiles;
 use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
 
 class ProfileController extends Controller
@@ -152,6 +157,25 @@ class ProfileController extends Controller
         return redirect()
             ->route('profile.show', $user->id)
             ->with('success', __('profile.update_account_success'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param UpdateUserPasswordRequest $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateProfilePassword(UpdateUserPasswordRequest $request, $id)
+    {
+        $user = User::find($id);
+        $user->password = Hash::make($request->input('password'));
+        $user->remember_token = Str::random(60);
+        $user->updated_ip_address = $request->ip();
+
+        return $user->save()
+            ? redirect()->back()->with('success', __('profile.update_password_success'))
+            : redirect()->back()->with('error', __('profile.update_password_error'));
     }
 
     /**

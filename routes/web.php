@@ -28,6 +28,7 @@ require __DIR__.'/auth.php';
 Route::group(['middleware' => 'auth'], function () {
 
     Route::put('profile/{id}', [ProfileController::class, 'updateProfile'])->name('profile.updateProfile');
+    Route::put('profile/{id}/update-profile-password', [ProfileController::class, 'updateProfilePassword'])->name('profile.updateProfilePassword');
 
     // Show users profile - viewable by other users.
     Route::resource('profile', ProfileController::class)->only([
