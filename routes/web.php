@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,15 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 require __DIR__.'/auth.php';
+
+// Registered and Activated User Routes
+Route::group(['middleware' => 'auth'], function () {
+
+    Route::put('profile/{id}', [ProfileController::class, 'updateProfile'])->name('profile.updateProfile');
+
+    // Show users profile - viewable by other users.
+    Route::resource('profile', ProfileController::class)->only([
+        'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
+    ]);
+
+});
